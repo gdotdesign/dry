@@ -1,0 +1,34 @@
+{
+  "name": "dry-lang",
+  "preferGlobal": "true",
+  "version": "0.1.0",
+  "author": "",
+  "description": "Frontend Language",
+  "contributors": [],
+  "bin": {
+    "dry": "./bin/dry"
+  },
+  "main": "",
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/gdotdesign/dry"
+  },
+  "dependencies" : {
+    "pegjs"               : "*",
+    "pegjs-coffee-plugin" : "*",
+    "coffee-script"       : "*",
+    "nconf"               : "*",
+    "zappajs"             : "*",
+    "browserify"          : "*",
+    "coffeeify"           : "*",
+    "uglify-js"           : "*",
+    "request"             : "*",
+    "ws"                  : "*",
+    "async"               : "*",
+    "glob"                : "*"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.8"
+  }
+}

@@ -1,0 +1,13 @@
+(->
+  window.__for__ = (base, method) ->
+    return unless base
+    if base instanceof Selector
+      base = base.getAll()
+    if base instanceof Array or base.length or base.hasOwnProperty('length')
+      for item,i in base
+        if item
+          method.call item, i
+    else if base instanceof Object
+      for own key,value of base
+        method.call {key:key, value:value}
+)()

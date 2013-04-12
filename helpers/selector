@@ -1,0 +1,68 @@
+(->
+  matches = null
+  class classList
+    constructor: (@sel)->
+    toggle: (name)-> el.classList.toggle(name) for el in @sel.getAll()
+    add: (name)-> el.classList.add(name) for el in @sel.getAll()
+    remove: (name)-> el.classList.remove(name) for el in @sel.getAll()
+  class window.Selector
+    @warp: (name) ->
+      (value) ->
+        if value isnt undefined
+          item[name] = value for item in @getAll()
+        else
+          ret = []
+          for item in @getAll()
+            ret.push item[name]
+          if ret.length > 1
+            ret
+          else
+            ret[0]
+    @warpStyle: (name) ->
+      (value) ->
+        if value
+          item.style[name] = value for item in @getAll()
+        else
+          ret = item.style[name] for item in @getAll()
+    @get "scope": ->
+      @_scope or document
+    @get 'classList': ->
+      return @_classList if !!@_classList
+      @_classList = new classList(@)
+    constructor: (@selector,@_scope) ->
+      @styles = {}
+    style: (name) ->
+      return @styles[name] if @styles[name]
+      ac = class Accessor
+      @styles[name] = new ac
+      ac.accessor value: Selector.warpStyle(name).bind @
+      @styles[name]
+    getAll: ->
+      Array::slice.call @scope.querySelectorAll(@selector)
+    querySelector: (selector)->
+      @scope.querySelector(selector)
+    appendChild: (el) ->
+      @scope.querySelector(@selector)?.appendChild el
+    getAttribute: (name)->
+      el.getAttribute?(name) for el in @getAll()
+    setAttribute: (name, value)->
+      el.setAttribute?(name,value) for el in @getAll()
+    addEventListener: (type,fn) ->
+      @scope.addEventListener type, (e) =>
+        if (n = match(@selector, e.target))
+          e.target = n
+          fn.call n, e
+      , true
+
+  match = (selector, node)->
+    matches ?= node.matchesSelector || node.mozMatchesSelector || node.webkitMatchesSelector || node.oMatchesSelector || node.msMatchesSelector
+    return if node is document
+    if matches.call node, selector
+      node
+    else if node.parentNode
+      match selector, node.parentNode
+    else
+      false
+
+  window.__selector__ = (s,sc) -> new Selector(s,sc)
+)()

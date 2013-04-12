@@ -1,0 +1,36 @@
+include "header"
+
+template try
+  %.container
+    %h3 "Try Dry in the browser"
+    %p "The left side is the Dry code and the right is the compiled javascript without helpers."
+    %hr
+    %.row
+      %.span6
+        %textarea[style=width: 100%;height: 520px;resize: none]
+      %.span6
+        %pre[style=min-height: 500px]
+          %code
+
+window::load
+  body = document.body
+  |body| << render try
+
+  |textarea|::keyup
+    code = ""
+    try
+      code = dry.compile(@value)
+    catch(error)
+      code = error.toString()
+    cd = body.querySelector('code')
+    cd.textContent = code
+
+
+  |textarea|::keydown
+    if event.keyCode is 9
+      event.preventDefault()
+      val = @value
+      start = @selectionStart
+      end = @selectionEnd
+      @value = val.substring(0, start) + '  ' + val.substring(end)
+      @selectionStart = @selectionEnd = start + 2

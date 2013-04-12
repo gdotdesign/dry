@@ -1,0 +1,19 @@
+__templates__ = {}
+__template__ = (name, els)->
+  __templates__[name] = ""
+  for el in els
+    __templates__[name] += el.outerHTML
+
+__render__ = (name, data) ->
+  el = document.createElement 'div'
+  temp = __templates__[name]
+  for key, value of data
+    temp = temp.replace new RegExp("{{#{key}}}",'g'), value
+  el.innerHTML = temp
+  df = document.createDocumentFragment()
+  if el.childNodes.length is 1
+    return el.firstChild
+  for child in Array::slice.call el.childNodes
+    df.appendChild child
+  df
+

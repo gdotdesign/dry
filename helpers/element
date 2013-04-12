@@ -1,0 +1,52 @@
+(->
+  Attributes =
+    title:{ prefix: "!", unique: true }
+    name:{ prefix: "&", unique: true }
+    type:{ prefix: "%", unique: true }
+    id:{ prefix: "#", unique: true }
+    class:{ prefix: "\\.", unique: false }
+    role:{ prefix: "~", unique: true }
+
+  prefixes = Object.pluck(Attributes,'prefix').concat("$").join("|")
+  Object.each Attributes, (key,value) -> value.regexp = new RegExp value.prefix+"(.*?)(?=#{prefixes})", "g"
+
+  _parseName = (name,atts = {}) ->
+    ret =
+      tag: name.match(new RegExp("^.*?(?=#{prefixes})"))[0] or 'div'
+      attributes: atts
+    Object.each Attributes, (key,value) ->
+      if (m = name.match(value.regexp)) isnt null
+        name = name.replace(value.regexp, "")
+        if value.unique
+          if atts[key]
+            ret.attributes[key] = atts[key] if atts[key] isnt null and atts[key] isnt undefined
+          else
+            ret.attributes[key] = m.pop().slice(1)
+        else
+          map = m.map (item) -> item.slice(1)
+          if atts[key]
+            if typeof atts[key] is 'string'
+              map = map.concat atts[key].split(" ")
+            else
+              map = map.concat atts[key]
+          ret.attributes[key] = map.compact().join(" ")
+      else
+        ret.attributes[key] = atts[key] if atts[key] isnt null and atts[key] isnt undefined
+    ret
+
+  window.__element__ = (node,atts,text,els) ->
+    switch typeof node
+      when 'string'
+        {tag,attributes} = _parseName node, atts
+        node = document.createElement tag.trim().replace /[^A-Za-z_\-0-9]/, ''
+        for key, value of attributes
+          unless value instanceof Function
+            node.setAttribute key, value
+        if text
+          node.textContent = text
+      else
+        node = document.createElement 'div'
+    for el in els
+      node.appendChild el
+    node
+)()

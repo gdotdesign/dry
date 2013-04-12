@@ -1,0 +1,23 @@
+template header
+  %.navbar.navbar-fixed-top
+    %.navbar-inner
+      %.container[style=width: 940px]
+        %a.brand[href=/]
+          %b "Dry "
+          %span "| The Frontend Languange"
+        %ul.nav.pull-right
+          %li#todo
+            %a[href=/install.html]
+              %i.icon-download-alt.icon-white[style=margin-right: 10px]
+              %span "Install"
+          %li#todo
+            %a[href=/try.html]
+              %i.icon-bolt.icon-white[style=margin-right: 10px]
+              %span "Try"
+          %li#contacts
+            %a[href=/docs.html]
+              %i.icon-bookmark.icon-white[style=margin-right: 10px]
+              %span "Documentation"
+
+window::load
+  |body| << render header

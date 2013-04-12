@@ -1,0 +1,43 @@
+include "header"
+
+template line
+  %li
+    %strong "{{name}}: "
+    %span "{{message}}"
+
+template page
+  %.container
+    %.row
+      %.span4
+        %h3 "Send Message"
+        %hr
+        %form
+          %label "Name"
+          %input%text&name.input-block-level
+          %label "Message"
+          %input%text&message.input-block-level
+      %.span8
+        %h3 "Messages"
+        %hr
+        %ul#messages.unstyled
+
+
+window::load
+  |body| << render page
+
+  |[name=message]|::keydown
+    if event.keyCode is 13
+      unless |[name=name]|.value
+        alert('You need a name!')
+      else
+        if @value
+          data = {
+            name: |[name=name]|.value
+            message: @value
+          }
+          @value = ""
+          ws.send(<data>)
+
+  ws = new WebSocket("ws://localhost:8080")
+  ws::message
+    |#messages| << render line with <event.data>

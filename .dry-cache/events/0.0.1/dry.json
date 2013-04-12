@@ -1,0 +1,8 @@
+{
+  "name":"events",
+  "main": "events",
+  "version": "0.0.1",
+  "dependencies": {
+    "emitter":  "0.0.2"
+  }
+}

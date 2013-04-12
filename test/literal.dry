@@ -1,0 +1,44 @@
+suite('Literals') &
+  suite('Self') &
+    assert('Self', self is window)
+
+  suite('Null & Undefined') &
+    assert('Null', null isnt false)
+    assert('Null isnt false', null isnt false)
+    assert('Undefined', undefined isnt false)
+    assert('Undefined isnt false', undefined isnt false)
+
+  suite('Boolean') &
+    assert('True', true)
+    assert('False', true isnt false)
+
+  suite('Number') &
+    assert('Integer', 123456789)
+    assert('Float', 12.52)
+
+  suite('String') &
+    assert('Single Quote', 'test')
+    assert('Double Quote', "test")
+
+  suite('Color') &
+    assert('lowercase 6digit hex', #ffffff is '#ffffff')
+    assert('uppercase 6digit hex', #FFFFFF is '#FFFFFF')
+    assert('lowercase 3digit hex', #fff is '#fff')
+    assert('uppercase 3digit hex', #FFF is '#FFF')
+    assert('rgb', rgb(0, 0, 0) is 'rgb(0,0,0)' )
+    assert('rgba', rgba(0, 0, 0, 0) is 'rgba(0,0,0,0)' )
+    assert('hsl', hsl(0, 0%, 0%) is 'hsl(0,0%,0%)' )
+    assert('hsla', hsla(0, 0%, 0%, 0) is 'hsla(0,0%,0%,0)' )
+
+  suite('Unit') &
+    assert('px', 20.4px is 20.4)
+    assert('em', 1em is 16)
+    assert('deg', 20.4deg is 20.4)
+    assert('rad', 20.4rad is 20.4)
+    assert('s', 1s is 1000)
+    assert('ms', 20.4 is 20.4ms)
+
+  suite('Json') &
+    obj = {key: 'value'}
+    assert('Should encode not string', <obj> is '{"key":"value"}')
+    assert('Should decode string', <'{"key":"value"}'>.key is 'value')

@@ -1,0 +1,7 @@
+(->
+  window.__json__ = (arg)->
+    if arg instanceof Object
+      JSON.stringify(arg)
+    else
+      JSON.parse(arg)
+)()

@@ -1,0 +1,13 @@
+include "header"
+
+template layout
+  %style ".well {height: 160px; line-height: 150px; text-align: center; font-size: 30px; display: block; color: #333;} .well:hover { text-decoration: none}"
+  %div.container
+    %div.row
+      %div.span4
+        %a.well[href=/todo] "Todo List"
+      %div.span4
+        %a.well[href=/contacts] "Contacts"
+
+window::load
+  |body| << render layout

@@ -1,0 +1,76 @@
+#!/usr/bin/env coffee
+
+fs    = require 'fs'
+nconf = require 'nconf'
+
+
+nconf.argv
+  i:
+    alias: 'input'
+    describe: 'Input File'
+  o:
+    alias: 'output'
+    describe: 'Output File'
+  v:
+    alias: 'version'
+    describe: 'Version'
+  l:
+    alias: 'log'
+    describe: 'Verbose logging'
+  w:
+    alias: 'workspace'
+    describe: 'Run development server'
+  h:
+    alias: 'help'
+    describe: 'Show help'
+  install:
+    describe: 'Install packages'
+
+if nconf.get('version')
+  console.log 'Dry - 0.1.0'
+  process.exit()
+
+if nconf.get('h')
+  nconf.stores.argv.showHelp()
+
+global.verbose = nconf.get('log')
+input = nconf.get('input')
+output = nconf.get('output')
+ws = nconf.get('workspace')
+
+if nconf.get('install')
+  {geatherFile} = require '../lib/compiler'
+  reqs = []
+  glob = require("glob")
+  glob "**/*.dry",{sync: true}, (err, files) ->
+    for file in files
+      geatherFile file, process.cwd(), reqs
+    b = []
+    reqs.filter (item) ->
+      b.push(item) if b.indexOf(item) is -1
+    for str in b
+      [lib,version] = str.split "@"
+      version ?= "*"
+      console.log 'Will get package: '+lib+' with version '+version
+
+
+if ws
+  workspace = require('./workspace.coffee').app
+  workspace.server.listen 4000, -> console.log "Dry workspace is ready at http://localhost:4000/"
+
+if input
+  unless fs.existsSync(input)
+    console.log 'Input file not exists'
+    process.exit()
+  unless output
+    console.log 'Missing output file'
+    process.exit()
+
+  try
+    {compileFile} = require '../lib/compiler'
+    compiled = compileFile input, process.cwd(), true, true, nconf.get('log')
+    #ugly = require("uglify-js")
+    #compiled = ugly.minify(compiled, fromString: true, mangle: {toplevel: true}).code
+    fs.writeFileSync output, compiled, 'UTF-8'
+  catch e
+    console.log e.toString()

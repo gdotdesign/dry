@@ -1,0 +1,38 @@
+Function::get = (obj)->
+  Object.forEach obj, (key,value) =>
+    unless @::__lookupSetter__(key)
+      @::__defineSetter__ key, (val)->
+        @["__"+key] = val
+    @::__defineGetter__ key, ->
+      value.call(@, @["__"+key])
+
+Function::set = (obj)->
+  Object.forEach obj, (key,value) =>
+    @::__defineSetter__ key, (val)->
+      @["__"+key] = value.call @, val
+    unless @::__lookupGetter__(key)
+      @::__defineGetter__ key, ->
+        @["__"+key]
+
+Function::prop = (key,val) ->
+  @::__defineSetter__ key, (value)->
+    @["__"+key] = value
+  @::__defineGetter__ key, ->
+    @["__"+key] or val
+
+Function::accessor = (obj) ->
+  for key, value of obj
+    @::__defineSetter__(key,value)
+    @::__defineGetter__(key,value)
+
+Function::mixin = (obj) ->
+  obj = obj.prototype if obj.prototype
+  for key in Object.getOwnPropertyNames(obj)
+    desc = Object.getOwnPropertyDescriptor(obj,key)
+    if desc
+      Object.defineProperty(@::,key,desc)
+    else
+      @::[key] = obj[key]
+  if pprop = Object.getPrototypeOf(obj)
+    unless pprop is Object::
+      @mixin pprop

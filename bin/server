@@ -1,0 +1,49 @@
+fs    = require 'fs'
+path  = require 'path'
+nconf = require 'nconf'
+
+WebSocketServer = require('ws').Server
+wss = new WebSocketServer({port: 8080})
+clients = []
+wss.on "connection", (ws) ->
+  clients.push(ws)
+  ws.on "message", (message) ->
+    for client in clients
+      client.send message
+  ws.on "close", ->
+    clients.splice(clients.indexOf(ws),1)
+
+
+nconf.argv
+  c:
+    alias: 'cache'
+    describe: 'Use cached require'
+    default: true
+  l:
+    alias: 'log'
+    describe: 'Verbose logging'
+
+cache = nconf.get('cache')
+global.verbose = nconf.get('log')
+
+template = (name)-> "<html><head><script src=\"#{name}.js\"></script></head></html>"
+
+compile = (file)->
+  if cache is 'false'
+    for key, value of require.cache
+      if !!key.match('dry') and !key.match('node_modules')
+        delete require.cache[key]
+  try
+    {compileFile} = require '../lib/compiler'
+    @response.set 'Content-Type', 'text/javascript'
+    return compileFile file, path.resolve(__dirname, '../')
+  catch e
+    @response.set 'Content-Type', 'text/css'
+    "window.onload = function(){document.body.textContent = '#{e.toString().replace(/\'/g,'"')}'}"
+
+require('zappajs') 4000, ->
+  @get "/tests.js", -> compile.call @, "test/index.dry"
+  @get "/tests",    -> template "tests"
+  @get "/:name.js", -> compile.call @, "examples/#{@params.name}.dry"
+  @get "/:name",    -> template @params.name
+  @get "/",         -> template "index"

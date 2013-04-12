@@ -1,0 +1,39 @@
+module Events
+
+  class Event
+    def constructor
+      @cancelled = false
+    def stop
+      @cancelled = true
+    def toString
+      "<Event>"
+
+  class Emitter
+    def addEventListener(type, callback)
+      unless @listeners
+        @listeners = {}
+      unless @listeners[type]
+        @listeners[type] = []
+      listeners = @listeners[type]
+      listeners.push(callback)
+    def trigger(type)
+      event = new Events:Event
+      target = event.target or self
+      @listeners[type] &&
+        unless event.cancelled
+          self.call(target,event)
+
+class Test
+  mixin Events:Emitter
+
+window::load
+  test = new Test
+  test::click
+    log self
+    |body| << %div "Got " + event.toString()
+
+  button = %button "Dispatch Event"
+  button::click
+    test.trigger('click')
+
+  |body| << button

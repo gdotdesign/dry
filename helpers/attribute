@@ -1,0 +1,20 @@
+(->
+  class AttributeDescriptor
+    constructor: (@el,@name)->
+    @get value: ->
+      val = @el.getAttribute @name
+      return true if val is 'true'
+      return false if val is 'false'
+      return "" if val is undefined
+      return val
+    @set value: (value) ->
+      if value is false
+        value = 'false'
+      @el.setAttribute @name, value
+
+  window.__attribute__ = (el,name) ->
+    el.__attributes__ ?= []
+    descriptor = el.__attributes__[name]
+    descriptor ?= el.__attributes__[name] = new AttributeDescriptor(el,name)
+    descriptor
+)()

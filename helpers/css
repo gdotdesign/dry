@@ -1,0 +1,17 @@
+( ->
+  class CSSDescriptor
+    constructor: (@el, @name)->
+    @get value: ->
+      if @currentStyle
+        @el.currentStyle[@name]
+      else
+        window.getComputedStyle(@el)[@name]
+    @set value: (value)->
+      @el.style[@name] = value
+
+  window.__css__ = (el,name) ->
+    el.__cssdescriptors__ ?= []
+    descriptor = el.__cssdescriptors__[name]
+    descriptor ?= el.__cssdescriptors__[name] = new CSSDescriptor(el,name)
+    descriptor
+)()

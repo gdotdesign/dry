@@ -1,0 +1,27 @@
+window::load
+
+  steps = 0
+  pass = 0
+  fail = 0
+  suites = 0
+
+  def assert(name, success)
+    steps += 1
+    if success
+      log '%c  ✔ ' + name, 'color: green; font-weight: bold'
+      pass += 1
+    else
+      log '%c  ✘ ' + name, 'color: red; font-weight: bold'
+      fail += 1
+
+  def suite(name, block)
+    suites += 1
+    console.groupCollapsed( '%c ' + name, 'font-weight: bold' )
+    if block
+      block()
+    console.groupEnd()
+
+  include 'element'
+  include 'literal'
+
+  log "%cSuites: " + suites + ", Steps: " + steps + " , Pass: " + pass + " , Fail: " + fail, 'font-weight: bold'

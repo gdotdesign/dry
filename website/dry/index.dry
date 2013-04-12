@@ -1,0 +1,56 @@
+include "header"
+
+template main
+  %.container
+    %.page-header
+      %h2
+        %b "Dry"
+      %p[style=font-size: 18px; line-height: 26px] "Dry is a language created for specifically frontend development, it compiles to JavaScript while adding helpers for mundane tasks. It makes everyday life of a Frontend Developer easy. Think of it as a JavaScript framework but as a language."
+      %p
+        %a.btn.btn-primary[style=margin-right: 10px][href=/install.html]
+          %i.icon-download-alt[style=margin-right: 10px]
+          %span "Install"
+        %a.btn.btn-inverse[style=margin-right: 10px]
+          %i.icon-github[style=margin-right: 10px]
+          %span "Github"
+        %a.btn.btn-info[style=margin-right: 10px]
+          %i.icon-dashboard[style=margin-right: 10px]
+          %span "Examples"
+    %.row
+      %.span12
+        %h3 "Highlights"
+      %.span5
+        %h4 "Elements, Selectors and Units are first-class citizens:"
+        %pre
+          %code "conatiner = %div.container\ncontainer#background-color = #f00\ncontainer.textContent = 'Dry is awesome'\n# Remove all p elements\n|p| && dispose self"
+        %h4 "DOM & Element modification made simple"
+        %pre
+          %code "# Create a div with container class\ncontainer = %div.container\n# Append container to body\n|body| << container\n# Change the font color\ncontainer#color = #fff\n# Set an attribute\ncontainer@data-id = 1\n# Access JavaScript properties\nconatiner.textContent = 'Hello'\n# Dispose element\nwait 3s\n  disopse container"
+        %h4 "Iteration"
+        %pre
+          %code "['a','b'] &&\n  log self\n{a: 'b', b:'c'} &&\n  log self.key\n  log self.value\n|code| &&\n  log self"
+        %h4 "Events"
+        %pre
+          %code "# Direct events\nwindow::load\n  log 'window loaded'\n# Delegated events\n|code|::click\n  log self\n# Bound events\nwindow::load!\n  log self"
+        %h4 "Module / Class System"
+        %pre
+          %code "module Person\n  class User\n    def constructor(@name)\n    def greet\n      log 'Hello ' + @name + '!'\n(new Person:User('Jhon')).greet()\n# Hello Jhon!"
+      %.span7
+        %h4 "XMLHttpRequests:"
+        %pre
+          %code '# Get users\n~ "/users"\n  log <@body>\n  # {"name":"Jhon Doe", "email": "jhon.doe@gmail.com"}\n# Put data\n~= "/users" with <{name:"Jane Doe", email:"jane.doe@gmail.com"}>\n  log @body\n  # success'
+        %h4 "Asnyc built in:"
+        %pre
+          %code 'await\n  wait 2s\n    log "first"\n  wait 1s\n    log "second"\n# first\n# second'
+        %h4 "JSON simplified:"
+        %pre
+          %code '# Encode Json\nlog <{name: "Jhon Doe"}>\n# {"name": "Jhon Doe"}\n\nDecode JSON String\nlog <' + "'" + '{"name": "Jhon Doe"}' + "'" + '>\n# {name: "Jhon Doe"}'
+        %h4 "Alternate Method Calls"
+        %pre
+          %code '# All do the same thing\nlocation.reload()\nlocation.reload!\nlocation.reload?'
+        %h4 "Template / Render"
+        %pre
+          %code '# Define template\ntemplate layout\n  %div.container\n    %div.nav\n# Render\n|body| << render layout'
+
+window::load
+  |body| << render main

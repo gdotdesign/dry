@@ -1,0 +1,31 @@
+window::load
+  |head| << %link[href=//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css][rel=stylesheet]
+  |head| << %link[href=//netdna.bootstrapcdn.com/bootswatch/2.3.1/cosmo/bootstrap.min.css][rel=stylesheet]
+  body = document.body
+  body#padding-top = 70px
+  body << render header
+  path = location.pathname
+  li = body.querySelector("#" + path.substr(1))
+  li#background-color = #333
+
+template header
+  %style ":focus {outline: none}"
+  %div.navbar.navbar-fixed-top
+    %div.navbar-inner
+      %div.container[style=width: 940px]
+        %a.brand[href=/]
+          %b "Dry "
+          %span "| Example Applications"
+        %ul.nav.pull-right
+          %li#chat
+            %a[href=/chat]
+              %i.icon-comment.icon-white[style=margin-right: 10px]
+              %span "Chat"
+          %li#todo
+            %a[href=/todo]
+              %i.icon-pencil.icon-white[style=margin-right: 10px]
+              %span "Todo"
+          %li#contacts
+            %a[href=/contacts]
+              %i.icon-user.icon-white[style=margin-right: 10px]
+              %span "Contacts"

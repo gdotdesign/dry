@@ -1,0 +1,21 @@
+Object.forEach = (object, fn) ->
+    for own key, value of object
+      fn.call object, key, value
+Object.merge = (to,from) ->
+  for key, value of from
+    to[key] = value
+
+Object.defineProperties Object::,
+  toFormData:
+    value: ->
+      ret = new FormData()
+      for own key, value of @
+        ret.append key, value
+      ret
+  toQueryString:
+    value: ->
+      (for own key, value of @
+        "#{key}=#{value.toString()}").join "&"
+Object.pluck   = (object, prop) -> for own key, value of object then value[prop]
+Object.each    = (object, fn) -> for own key, value of object then fn.call object, key, value
+Array::compact = -> @filter (item) -> !!item

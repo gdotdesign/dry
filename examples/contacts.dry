@@ -1,0 +1,161 @@
+include "header"
+
+template item
+  %li
+    %a[data-id={{id}}][style=padding: 3px 5px]
+      %span "{{name}}"
+      %i.icon-remove[style=float: right;margin-top: 3px]
+
+template welcome
+  %div.page-header
+    %h2 "Welcome"
+  %p "This is an example application created with Dry!"
+
+template contact
+  %div
+    %div.page-header
+      %h2 "{{name}}"
+    %dl
+      %dt "Name"
+      %dd&name[contenteditable=true][spellcheck=false] "{{name}}"
+      %dt "Email"
+      %dd
+        %a.icon-share[link=mailto:]
+        %span&email[contenteditable=true][spellcheck=false] "{{email}}"
+      %dt "Phone Number"
+      %dd&phone[contenteditable=true][spellcheck=false] "{{phone}}"
+      %dt "Bitbucket"
+      %dd
+        %a.icon-share[link=http://bitbucket.org/]
+        %span&bitbucket[contenteditable=true][spellcheck=false] "{{bitbucket}}"
+      %dt "Github"
+      %dd
+        %a.icon-share[link=http://github.com/]
+        %span&github[contenteditable=true][spellcheck=false] "{{github}}"
+
+template form
+  %div.page-header
+    %h2 "New Contact"
+  %form
+    %label "Name"
+    %input&name%text.input-block-level[placeholder=Jhon Doe][required=true]
+    %label "Email"
+    %input&email%email.input-block-level[placeholder=jhon.doe@gmail.com][required=true]
+    %label "Phone Number"
+    %input&phone%text.input-block-level[placeholder=+36507285687]
+    %label "Bitbucket"
+    %input&bitbucket%text.input-block-level[placeholder=jhon.doe]
+    %label "Github"
+    %input&github%text.input-block-level[placeholder=jhon.doe]
+    %input%submit.btn.btn-primary[value=Add]
+
+template layout
+  %style "dd, dt {float: left; height: 40px} dt {clear: both; width: 120px} .icon-share { cursor: pointer }"
+  %div.container
+    %div.row
+      %div.span3
+        %div.page-header
+          %h3 "Contacts"
+        %div.well[style=padding: 10px]
+          %ul.nav.nav-list#list
+            %li.devider
+        %ul.nav.nav-list
+          %li
+            %a[href=#new]
+              %i.icon-plus
+              %span "Add New"
+      %div.span9
+
+module Contacts
+
+  class Contact
+    def constructor(data,index)
+      self &= data
+      @id = index
+      @base = render contact with self
+      @base::click!
+        target = event.target
+        if target@link
+          next = target.nextElementSibling
+          open(target@link + next.textContent)
+      @base::blur!
+        target = event.target
+        if target@name
+          self[target@name] = target.textContent
+          Contacts.save!
+
+    def toObj
+      obj = {
+        name: @name
+        email: @email
+        phone: @phone
+        bitbucket: @bitbucket
+        github: @github
+      }
+
+  def save
+    items = @contacts && @toObj()
+    localStorage.setItem('contacts', <items>)
+    @renderList!
+    @handleHashChange!
+
+  def renderList
+    |#list > *| && dispose self
+    @contacts &&
+      |#list| << render item with self
+
+  def add(data)
+    item = new Contacts:Contact(data, @contacts.length)
+    @contacts.push(item)
+    location.hash = @contacts.length - 1
+    @save!
+
+  def handleHashChange
+    hash = location.hash
+    hash = hash.substr(1)
+    |[data-id]| && self.parentNode *- 'active'
+    unless hash
+      |.span9| << render welcome
+      return
+    |.span9 > *| && dispose self
+    if hash is "new"
+      |.span9| << render form
+    else
+      id = parseInt(hash)
+      contact = @contacts[id]
+      body = |body|
+      anchor = body.querySelector('[data-id="' + id + '"]' )
+      if anchor
+        anchor.parentNode  *+ 'active'
+      if contact
+        |.span9| << contact.base
+      else
+        |.span9| << render welcome
+
+window::load
+  |body| << render layout
+
+  contacts = Contacts.contacts = <localStorage.getItem('contacts')> (index) && new Contacts:Contact(self, index)
+  Contacts.renderList!
+  Contacts.handleHashChange!
+
+  |[data-id]|::click
+    location.hash = self@data-id
+
+  |.icon-remove|::click
+    event.preventDefault()
+    event.stopPropagation()
+    parent = self.parentNode
+    contacts[parseInt(parent@data-id)] = null
+    hash = location.hash
+    Contacts.save!
+
+  |form|::submit
+    event.preventDefault!
+    data = {}
+    |form [name]| &&
+      data[self@name] = self.value
+    Contacts.add(data)
+
+window::hashchange
+  Contacts.handleHashChange!

@@ -1,0 +1,32 @@
+include "header"
+
+template install
+  %.container
+    %h3 "Install"
+    %p "To install, first make sure you have a working copy of the latest stable version of Node.js, and npm (the Node Package Manager). You can then install Dry with npm:"
+    %pre
+      %code "npm install dry-lang -g"
+    %p "You may need to use sudo on linux."
+    %hr
+    %h3 "CLI"
+    %p "Dry comes with a cli (command line interface) to compile dry files and to run a static server for development purposes:"
+    %pre
+      %code "dry -h\n-------------------------------------------\nOptions:\n   -i, --input      Input File\n   -o, --output     Output File\n   -v, --version    Version\n   -l, --log        Verbose logging\n   -w, --workspace  Run development server\n   -h, --help       Show help"
+    %h4 "Examples:"
+    %ul
+      %li "Compile a single file:  "
+        %code "dry -i input.dry -o output.dry"
+      %li "Start a development server:  "
+        %code "dry -w"
+      %li "Show help:  "
+        %code "dry -h"
+    %hr
+    %h3 "Development server"
+    %p
+      %span "You can start a development server (workspace) with:  "
+      %code "dry -w"
+      %span "This will start a static http server that serves files from the CWD (current working directory), and compiles all files with  "
+      %code ".dry"
+      %span "extension to JavaScript."
+window::load
+  |body| << render install

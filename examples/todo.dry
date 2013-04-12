@@ -1,0 +1,76 @@
+include "header"
+
+template form
+  %div.container
+    %div.page-header
+      %h2 "ToDo List"
+      %p "This is an example application created with Dry, for your List needs! There are no markup just code with Dry and Twitter Bootstrap!"
+    %ul.unstyled.well.nav.nav-list#list
+      %li.nav-header "Items"
+    %form[style=margin-top: 20px]
+      %input.input-block-level[type=text][placeholder=Add new item][style=margin-bottom: 0]
+    %input.btn-primary.btn[type=button][value=Add Item]
+    %button.btn-warning.btn[style=margin-left: 10px] "Clear List"
+
+template listItem
+  %li[data-done={{done}}][style=padding: 5px 0;border-top: 1px solid #ddd]
+    %span.title[contenteditable=true][spellcheck=false] "{{title}}"
+    %i.icon-remove[style=float: right;cursor:pointer;margin-left: 10px;margin-top: 3px]
+    %i.icon-ok[style=float: right;cursor:pointer;margin-top: 3px]
+
+module List
+  class Item
+    get done
+      @base@data-done
+    set done(value)
+      @base@data-done = value
+      @span#text-decoration = @done ? "line-through" : "none"
+
+    def constructor(data)
+      @base = render listItem with data
+      @span = @base.querySelector('span')
+      self &= data
+
+      @span::blur!
+        List.save!
+
+      ok = @base.querySelector('.icon-ok')
+      ok::click!
+        @done = @done ? false : true
+        List.save!
+
+      remove = @base.querySelector('.icon-remove')
+      remove::click!
+        dispose @base
+        List.save!
+
+  def addItem(data)
+    li = new List:Item(data)
+    |ul#list| << li.base
+
+  def addItemFromInput
+    value = |input[type=text]|.value
+    if value
+      @addItem({title: value, done: false})
+      |input[type=text]|.value = ''
+      @save!
+
+  def save
+    items = |li[data-done]| && { title: \.title\.textContent, done: self@data-done }
+    localStorage.setItem('todo-list',<items>)
+
+window::load
+  |body| << render form
+
+  |.container > button|::click
+    |li[data-done]| && dispose self
+    List.save!
+
+  |.container > input|::click
+    List.addItemFromInput!
+
+  |form|::submit
+    event.preventDefault()
+    List.addItemFromInput!
+
+  <localStorage.getItem('todo-list')> && List.addItem(self)

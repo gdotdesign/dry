@@ -1,0 +1,60 @@
+el = %div.class#id&test%text!Tooltip~test-element[url=http://dry-lang.com] 'text'
+|body| << el
+
+suite('Element') &
+  suite('Element Creation') &
+
+    assert('Should create className', el@class is 'class')
+    assert('Should create element',el.tagName is 'DIV')
+    assert('Should create attribute id', el@id is 'id')
+    assert('Should create attribute name', el@name is 'test')
+    assert('Should create attribute type', el@type is 'text')
+    assert('Should create attribute title', el@title is 'Tooltip')
+    assert('Should create attribute role', el@role is 'test-element')
+    assert('Should create attribute by attributeSelector', el@url is 'http://dry-lang.com')
+    assert('Should create text node', el.textContent is 'text')
+
+  suite('Class Opartors') &
+    el *~ 'class'
+    assert('Should toggle class', el@class is '')
+    |div| *~ 'class'
+    assert('Should toggle class for collections', el@class is 'class')
+    el *+ 'class'
+    assert('Should add class', el@class is 'class')
+    |div| *+ 'test'
+    assert('Should add class for collections', el@class is 'class test')
+    |div| *- 'test'
+    assert('Should remove class for collections', el@class is 'class')
+    el *- 'class'
+    assert('Should remove class', el@class is '')
+
+  suite('Attribute Accessor') &
+    assert('Should read attribute', el@name is 'test')
+    el@name = 'hello'
+    assert('Should write attribute', el@name is 'hello')
+    attributes = |div|@name
+    assert('Should read attributes of collections', attributes[0] is 'hello')
+    |div|@name = 'test'
+    attributes = |div|@name
+    assert('Should write attributes of collections', attributes[0] is 'test')
+
+  suite('Style Accessor') &
+    assert('Should read css', el#display is 'block')
+    el#display = 'none'
+    style = el.style
+    assert('Should write css', style.display is 'none')
+    displays = |div|#display
+    assert('Should read css of collections', displays[0] is 'none')
+    |div|#display = 'block'
+    displays = |div|#display
+    assert('Should write css of collections', displays[0] is 'block')
+
+  suite('Property Accessor') &
+    assert('Should read property', el.custom is undefined)
+    el.custom = 'custom'
+    assert('Should write property', el.custom is 'custom')
+    customs = |div|.custom
+    assert('Should read property of collections', customs[0] is 'custom')
+    |div|.custom = 'test'
+    customs = |div|.custom
+    assert('Should write property of collections', customs[0] is 'test')
