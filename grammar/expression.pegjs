@@ -27,6 +27,7 @@ Statement
   / Contsructor
   / Def
   / Dispose
+  / Delete
   / Event
   / Operation
   / Call
@@ -161,6 +162,9 @@ Log
 Dispose
   = "dispose" _+ base:LEFT { new @Dispose type: 'dispose', exp: base }
 
+Delete
+  = "delete" _+ base:LEFT { new @Delete type: 'delete', exp: base }
+
 Event
   = base:LEFT "::" name:Identifier bound:"!"? { new @Event type: 'event', base:base, name: name, bound: bound }
 
@@ -200,6 +204,7 @@ Operator
   / "*+"
   / "*-"
   / "+="
+  / "-="
   / "isnt"
   / "is"
   / "="
@@ -210,8 +215,10 @@ Operator
   / "*"
   / "and"
   / ">"
+  / "<"
   / "%"
   / "/"
   / "|"
   / "or"
   / "&="
+  / "?="

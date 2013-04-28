@@ -1,3 +1,4 @@
+
 __templates__ = {}
 __template__ = (name, els)->
   __templates__[name] = ""
@@ -12,7 +13,9 @@ __render__ = (name, data) ->
   el.innerHTML = temp
   df = document.createDocumentFragment()
   if el.childNodes.length is 1
-    return el.firstChild
+    l = el.firstChild
+    el.removeChild l
+    return l
   for child in Array::slice.call el.childNodes
     df.appendChild child
   df

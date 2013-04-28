@@ -1,6 +1,7 @@
 fs    = require 'fs'
 path  = require 'path'
 nconf = require 'nconf'
+autoprefixer = require('autoprefixer')
 
 nconf.argv
   c:
@@ -30,6 +31,9 @@ compile = (file)->
 module.exports.app = require('zappajs').app ->
   @use @app.router
   @use 'static': process.cwd()
+  @get "*.css", ->
+    p = path.resolve process.cwd(), @params[0].substr(1)
+    autoprefixer.compile fs.readFileSync(p+".css",'utf-8')
   @get "*.dry",     ->
     p = path.resolve process.cwd(), @params[0].substr(1)
     compile.call @, p
