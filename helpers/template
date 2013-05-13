@@ -1,3 +1,4 @@
+
 __templates__ = {}
 __template__ = (name, els)->
   __templates__[name] = ""

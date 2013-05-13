@@ -3,7 +3,6 @@
 fs    = require 'fs'
 nconf = require 'nconf'
 
-
 nconf.argv
   i:
     alias: 'input'
@@ -20,11 +19,16 @@ nconf.argv
   w:
     alias: 'workspace'
     describe: 'Run development server'
+  b:
+    alias: 'build'
+    describe: 'Run in node webkit'
   h:
     alias: 'help'
     describe: 'Show help'
   install:
     describe: 'Install packages'
+
+global.verbose = nconf.get('log')
 
 if nconf.get('version')
   console.log 'Dry - 0.1.0'
@@ -32,11 +36,57 @@ if nconf.get('version')
 
 if nconf.get('h')
   nconf.stores.argv.showHelp()
+  process.exit()
 
-global.verbose = nconf.get('log')
+if nconf.get('b')
+  execSync = require('execSync')
+  {jsdom} = require("jsdom")
+  async   = require 'async'
+  request = require('request')
+  {compileFile} = require '../lib/compiler'
+  autoprefixer = require('autoprefixer')
+
+  console.log 'Buliding project'
+
+  execSync.exec "rm -rf #{process.cwd()}/build"
+  execSync.exec "mkdir #{process.cwd()}/build"
+  execSync.exec "mkdir #{process.cwd()}/build/vendor"
+  execSync.exec "mkdir #{process.cwd()}/build/js"
+  execSync.exec "cp -r #{process.cwd()}/js/* #{process.cwd()}/build/js"
+  execSync.exec "cp #{process.cwd()}/* #{process.cwd()}/build"
+
+  document = jsdom fs.readFileSync(process.cwd()+"/index.html","UTF-8"), null, features: FetchExternalResources: false, ProcessExternalResources: false
+
+  actions = []
+  Array::slice.call(document.querySelectorAll('link[rel=stylesheet]:not([data-noprefix])')).forEach (link) ->
+    console.log "Prefixing: "+link.href
+    compiled = autoprefixer.compile fs.readFileSync(process.cwd()+"/"+link.href,'utf-8')
+    fs.writeFileSync process.cwd()+'/build/'+link.href, compiled, 'UTF-8'
+  Array::slice.call(document.querySelectorAll('script')).forEach (script) ->
+    if script.src.match(/^http/) or script.src.match(/^\/\//)
+      actions.push (next)->
+        console.log 'Download: '+script.src
+        request script.src, (error, response, body) ->
+          if not error and response.statusCode is 200
+            filename = script.src.split("/").pop()
+            fs.writeFileSync process.cwd()+'/build/vendor/'+filename, body, 'UTF-8'
+            script.src = "vendor/"+filename
+            next()
+    if script.src.match(/\.dry$/)
+      console.log 'Compile: '+script.src
+      filename = script.src.split("/").pop().replace /\.dry$/, ".js"
+      compiled = compileFile script.src, process.cwd(), true, true, nconf.get('log')
+      fs.writeFileSync process.cwd()+'/build/js/'+filename, compiled, 'UTF-8'
+      script.src = 'js/'+filename
+  actions.push ->
+    fs.writeFileSync(process.cwd()+"/build/index.html",document.innerHTML,"UTF-8")
+    process.exit()
+  async.series actions
+
 input = nconf.get('input')
 output = nconf.get('output')
 ws = nconf.get('workspace')
+
 
 if nconf.get('install')
   {geatherFile} = require '../lib/compiler'
@@ -52,7 +102,6 @@ if nconf.get('install')
       [lib,version] = str.split "@"
       version ?= "*"
       console.log 'Will get package: '+lib+' with version '+version
-
 
 if ws
   workspace = require('./workspace.coffee').app

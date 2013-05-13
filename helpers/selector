@@ -49,7 +49,7 @@
       el.setAttribute?(name,value) for el in @getAll()
     addEventListener: (type,fn) ->
       @scope.addEventListener type, (e) =>
-        if (n = match(@selector, e.target))
+        if (n = match(@selector, e.target or e.touches[0].target))
           e.target = n
           fn.call n, e
       , true

@@ -8,7 +8,7 @@
   "bin": {
     "dry": "./bin/dry"
   },
-  "main": "",
+  "main": "index.coffee",
   "repository": {
     "type": "git",
     "url": "https://bitbucket.org/gdotdesign/dry"
@@ -27,7 +27,9 @@
     "async"               : "*",
     "glob"                : "*",
     "jade":"*",
-    "autoprefixer": "*"
+    "autoprefixer"        : "*",
+    "jsdom"               : "*",
+    "execSync"            : "*"
   },
   "license": "MIT",
   "engines": {
