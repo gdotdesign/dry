@@ -12,7 +12,9 @@ __render__ = (name, data) ->
   el.innerHTML = temp
   df = document.createDocumentFragment()
   if el.childNodes.length is 1
-    return el.firstChild
+    x = el.firstElementChild
+    el.removeChild x
+    return x
   for child in Array::slice.call el.childNodes
     df.appendChild child
   df

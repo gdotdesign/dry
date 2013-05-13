@@ -25,7 +25,9 @@
     "request"             : "*",
     "ws"                  : "*",
     "async"               : "*",
-    "glob"                : "*"
+    "glob"                : "*",
+    "jade":"*",
+    "autoprefixer": "*"
   },
   "license": "MIT",
   "engines": {
