@@ -33,7 +33,7 @@ compile = (file)->
 module.exports.app = require('zappajs').app ->
   @use @app.router
   @use 'static': process.cwd()
-  @all "*", ->
+  @all "*/", ->
     p = path.resolve process.cwd(), @params[0].substr(1)
     return @next() unless fs.existsSync(p)
     if fs.statSync(p).isDirectory()
