@@ -4,6 +4,7 @@ nconf = require 'nconf'
 coffee = require 'coffee-script'
 autoprefixer = require('autoprefixer')
 jade = require('jade')
+sass = require('node-sass')
 
 nconf.argv
   c:
@@ -49,6 +50,11 @@ module.exports.app = require('zappajs').app ->
     p = path.resolve process.cwd(), @params[0].substr(1)
     @response.set 'Content-Type', 'text/javascript'
     coffee.compile fs.readFileSync(p+".coffee",'utf-8'), {bare: true}
+  @get "*.scss", ->
+    p = path.resolve process.cwd(), @params[0].substr(1)+".scss"
+    @response.set 'Content-Type', 'text/css'
+    autoprefixer.compile sass.renderSync
+      data: fs.readFileSync(p,'utf-8')
   @get "*.css",     ->
     p = path.resolve process.cwd(), @params[0].substr(1)+".css"
     @response.set 'Content-Type', 'text/css'

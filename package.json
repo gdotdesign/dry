@@ -29,7 +29,8 @@
     "jade":"*",
     "autoprefixer"        : "*",
     "jsdom"               : "*",
-    "execSync"            : "*"
+    "execSync"            : "*",
+    "node-sass"           : "*"
   },
   "license": "MIT",
   "engines": {
